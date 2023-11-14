@@ -1,0 +1,23 @@
+﻿@page
+@model WeatherArchivePreview.Pages.Upload
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Upload data</title>
+</head>
+<body>
+<div>
+    @using (Html.BeginForm("up_post", "Uploader", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <input type="file" multiple name="file" accept=".xlsx"/>
+        <input type="submit" value="Upload"/>
+    }
+</div>
+</body>
+</html>

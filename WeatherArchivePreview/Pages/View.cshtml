@@ -1,0 +1,122 @@
+﻿@page
+@using System.Globalization
+@model WeatherArchivePreview.Pages.View
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+@functions
+{
+
+    public class ListItem
+    {
+        public string Value;
+        public string Text;
+    }
+
+    public void MMChange()
+    {
+        Console.WriteLine("changed!");
+    }
+
+    public string IsYearSelected(int modelWeather)
+    {
+        if (Model.Year == modelWeather.ToString())
+        {
+            return "selected";
+        }
+        return "";
+    }
+
+    public string IsMonthSelected(string modelWeather)
+    {
+        if (Model.Month == modelWeather)
+        {
+            return "selected";
+        }
+        return "";
+    }
+
+    public string GetEnglishMonth(string modelWeather)
+    {
+        if (modelWeather == null || modelWeather == "None") return "None";
+        var ind = CultureInfo.CurrentCulture.DateTimeFormat.MonthNames.ToList().IndexOf(modelWeather);
+        return CultureInfo.InvariantCulture.DateTimeFormat.MonthNames[ind];
+    }
+
+    public string DoColorCurrentPage(int i)
+    {
+        return i == IntPtr.Parse(Request.Query["page"]) ? $"->{i}<-" : $"{i}";
+    }
+}
+
+<html>
+<head>
+    <title>View data</title>
+</head>
+<body>
+<div >
+    @if (!(Model != null && Model.Weathers != null) || Model?.Weathers?.Count == 0)
+    {
+        <div>Нету данных</div>
+        <button onclick="window.location.href = '/Upload'">Перейти к загрузке архивов</button>
+    }
+    else
+    {
+        <div>
+
+
+
+            @using (Html.BeginForm(FormMethod.Post))
+            {
+                <select asp-for="Year" name="Year" onchange="this.form.submit();">
+                    <option value="None">No year.</option>
+                    @foreach (var modelWeather in Model.Years)
+                    {
+                        <option @IsYearSelected(modelWeather) value="@modelWeather">@modelWeather</option>
+                    }
+                </select>
+                <select asp-for="Month" name="Month" onchange="this.form.submit();">
+                    <option value="None">No month.</option>
+                    @foreach (var modelWeather in Model.Months)
+                    {
+                        <option @IsMonthSelected(modelWeather) value="@modelWeather">@modelWeather</option>
+                    }
+                </select>
+            }
+
+
+        </div>
+        <div style=" white-space:nowrap; overflow: scroll;  background-color: #ccc;">
+            @{
+        {
+            foreach (var w in Model.Weathers)
+            {
+                <div >
+                    @w.ToString()
+                    <p>
+                </div>
+            }
+        }
+
+            }
+        </div>
+        <div>
+            @{
+                for (var i = int.Parse(Request.Query["page"]) - 15; i < int.Parse(Request.Query["page"]) + 15 + 1; i++)
+                {
+                    if (i >= 0)
+                    {
+                        <button onclick="window.location.href = '/View?page=@i&month_filter=@GetEnglishMonth(Model.Month)&year_filter=@Model.Year'">@DoColorCurrentPage(i)</button>
+                    }
+                }
+            }
+
+        </div>
+    }
+</div>
+</body>
+</html>

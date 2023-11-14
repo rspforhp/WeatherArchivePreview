@@ -11,16 +11,6 @@
 @functions
 {
 
-    public class ListItem
-    {
-        public string Value;
-        public string Text;
-    }
-
-    public void MMChange()
-    {
-        Console.WriteLine("changed!");
-    }
 
     public string IsYearSelected(int modelWeather)
     {
@@ -55,7 +45,7 @@
 
 <html>
 <head>
-    <title>View data</title>
+    <title>Просмотр</title>
 </head>
 <body>
 <div >
@@ -73,14 +63,14 @@
             @using (Html.BeginForm(FormMethod.Post))
             {
                 <select asp-for="Year" name="Year" onchange="this.form.submit();">
-                    <option value="None">No year.</option>
+                    <option value="None">Без года</option>
                     @foreach (var modelWeather in Model.Years)
                     {
                         <option @IsYearSelected(modelWeather) value="@modelWeather">@modelWeather</option>
                     }
                 </select>
                 <select asp-for="Month" name="Month" onchange="this.form.submit();">
-                    <option value="None">No month.</option>
+                    <option value="None">Без месяца</option>
                     @foreach (var modelWeather in Model.Months)
                     {
                         <option @IsMonthSelected(modelWeather) value="@modelWeather">@modelWeather</option>

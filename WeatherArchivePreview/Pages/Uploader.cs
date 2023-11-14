@@ -20,8 +20,6 @@ public class Uploader : Controller
     [HttpPost]
     public IActionResult up_post()
     {
-        Console.WriteLine("test3");
-
         using var context = _contextFactory.CreateDbContext();
         context.Database.EnsureCreated();
         context.Database.BeginTransaction();
@@ -51,11 +49,8 @@ public class Uploader : Controller
         foreach (var w in wL)
             if (list.Find(a => a.DateNTime == w.DateNTime) == null)
                 context.Weathers.Add(w);
-
-
         context.SaveChanges();
         context.Database.CommitTransaction();
-
-        return Ok("Uploaded!");
+        return Ok("Загружено!");
     }
 }

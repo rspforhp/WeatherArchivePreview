@@ -9,20 +9,16 @@ namespace WeatherArchivePreview.Pages;
 public class View : PageModel
 {
     public readonly IDbContextFactory<AppDbContext> _contextFactory;
-    private IWebHostEnvironment _environment;
     public List<string> Months;
-
     public List<AppDbContext.Weather> Weathers;
     public List<int> Years;
 
-    public View(IWebHostEnvironment environment, IDbContextFactory<AppDbContext> contextFactory)
+    public View(IDbContextFactory<AppDbContext> contextFactory)
     {
         _contextFactory = contextFactory;
-        _environment = environment;
     }
 
     [BindProperty] public string Year { get; set; }
-
     [BindProperty] public string Month { get; set; }
 
     public void OnPost()
@@ -38,6 +34,8 @@ public class View : PageModel
         Response.Redirect($"/View?page={Request.Query["page"]}&year_filter={Year}&month_filter={monthName}");
     }
 
+    public static List<AppDbContext.Weather> ws;
+
     public void OnGet()
     {
         Year = Request.Query["year_filter"];
@@ -45,7 +43,6 @@ public class View : PageModel
         if (m.Count > 0 && m != "None" && m.ToString() != null)
         {
             var ind = CultureInfo.InvariantCulture.DateTimeFormat.MonthNames.ToList().IndexOf(m);
-
             Month = CultureInfo.CurrentCulture.DateTimeFormat.MonthNames[ind];
         }
 
@@ -54,10 +51,11 @@ public class View : PageModel
         Weathers = new List<AppDbContext.Weather>();
         var page = int.Parse(Request.Query["page"]);
         using var db = _contextFactory.CreateDbContext();
-        List<AppDbContext.Weather> ws;
         try
         {
-            ws = db.Weathers.ToList();
+            //Dont wanna query everything multiple times:p
+            if (ws == null || ws.Count != ((IQueryable<AppDbContext.Weather>)db.Weathers).Count())
+                ws = db.Weathers.ToList();
         }
         catch (Exception e)
         {
@@ -82,6 +80,7 @@ public class View : PageModel
             }
 
             for (var i = 0; i < 30; i++)
+            {
                 try
                 {
                     Weathers.Add(ar[i + page * 30]);
@@ -89,6 +88,7 @@ public class View : PageModel
                 catch (ArgumentException e)
                 {
                 }
+            }
         }
     }
 }
